@@ -108,10 +108,10 @@ Subscriber dapat berupa: User, Company, Organization, atau custom Eloquent model
 *(Catatan: Maintainability lebih diutamakan daripada membuat compatibility hack yang buruk.)*
 
 ## Current Development Stage
-Current Stage: Stage 1 — Package foundation
+Current Stage: Stage 7 — Plan Management Dashboard
 Status: Completed
-Last Completed: Setup composer, config, and testbench with PHPUnit
-Next Planned: Stage 2
+Last Completed: Plan CRUD functionality, Form Requests validation, and Plan Management views.
+Next Planned: Stage 8
 
 ## Architecture Decision Log
 
@@ -124,6 +124,14 @@ Next Planned: Stage 2
 | 2026-08-29 | Dashboard merupakan bagian resmi package. | Fitur inti, bukan sekadar playground/demo. |
 | 2026-08-29 | UI tidak boleh bergantung frontend build host application. | Menjamin package bisa dipasang di project apa saja tanpa merusak stack mereka. |
 | 2026-08-29 | Menggunakan PHPUnit untuk testing. | Standar komunitas, kompatibilitas bawaan dengan Orchestra Testbench. |
+| 2026-08-29 | Menggunakan native PHP Enum untuk `IntervalUnit`. | Memberikan type-safety dan validasi otomatis saat query/penyimpanan ke model Plan. |
+| 2026-08-29 | Kolom `subscriber_id` menggunakan tipe `string` (bukan unsignedBigInteger). | Memastikan dukungan default untuk integer, UUID, dan ULID tanpa perlu mengubah konfigurasi migration. |
+| 2026-08-29 | Melarang overlapping active subscriptions. | `SubscriptionManager::subscribe` melempar `AlreadySubscribedException` jika dicoba pada subscriber yang masih aktif. Menjaga state tetap sederhana. |
+| 2026-08-29 | Renewal behavior. | Active renew = `ends_at` + plan_interval. Expired renew = starts dari `now()`. Mencegah hilangnya sisa periode. |
+| 2026-08-29 | Cancel semantics. | Graceful (`cancel(immediately: false)`) tetap active hingga `ends_at` tetapi merekam `cancelled_at`. Immediate (`cancel(immediately: true)`) mengganti status ke Cancelled dan mengubah `ends_at` ke `now()`. |
+| 2026-08-29 | Status Expired. | Status tidak kadaluarsa secara magis. Fungsi `markAsExpired` dipanggil (misalnya via job/cron) untuk materialisasi status Expired, tapi method `active()` tetap selalu akurat berdasarkan time window. |
+| 2026-08-29 | Change Plan behavior V1. | Pindah plan langsung memutus plan lama, memulai plan baru dari `now()` tanpa proration balance otomatis, demi menjaga kompleksitas V1 tetap rendah. |
+| 2026-08-29 | Dashboard Authorization Pattern. | Otorisasi diserahkan pada Closure kustom melalui facade `JustSubs::auth()`. Secara default (jika callback tidak di-set), dashboard tertutup (403), kecuali di environment `local`. Ini menghindari expose tidak sengaja di production. |
 
 ## Updating This File
 File `.agents/knowledge.md` ini HANYA diperbarui untuk keputusan yang memiliki dampak lintas tahap atau keputusan arsitektur jangka panjang.
