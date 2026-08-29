@@ -108,10 +108,10 @@ Subscriber dapat berupa: User, Company, Organization, atau custom Eloquent model
 *(Catatan: Maintainability lebih diutamakan daripada membuat compatibility hack yang buruk.)*
 
 ## Current Development Stage
-Current Stage: Stage 7 — Plan Management Dashboard
+Current Stage: Stage 8 — Subscription Management Dashboard
 Status: Completed
-Last Completed: Plan CRUD functionality, Form Requests validation, and Plan Management views.
-Next Planned: Stage 8
+Last Completed: Subscription index, detail view, filtering, and HTTP action wrappers for domain service. Subscriber Resolver API.
+Next Planned: Stage 9
 
 ## Architecture Decision Log
 
@@ -132,6 +132,7 @@ Next Planned: Stage 8
 | 2026-08-29 | Status Expired. | Status tidak kadaluarsa secara magis. Fungsi `markAsExpired` dipanggil (misalnya via job/cron) untuk materialisasi status Expired, tapi method `active()` tetap selalu akurat berdasarkan time window. |
 | 2026-08-29 | Change Plan behavior V1. | Pindah plan langsung memutus plan lama, memulai plan baru dari `now()` tanpa proration balance otomatis, demi menjaga kompleksitas V1 tetap rendah. |
 | 2026-08-29 | Dashboard Authorization Pattern. | Otorisasi diserahkan pada Closure kustom melalui facade `JustSubs::auth()`. Secara default (jika callback tidak di-set), dashboard tertutup (403), kecuali di environment `local`. Ini menghindari expose tidak sengaja di production. |
+| 2026-08-29 | Subscriber Resolver Strategy. | Daripada menebak atau menggunakan Dynamic SQL untuk melacak `name`/`email` dari Polymorphic Subscriber, kita menyediakan Public API: `JustSubs::resolveSubscriberNameUsing(Closure)`. Default *fallback*-nya mengecek object property `name` atau `email`. |
 
 ## Updating This File
 File `.agents/knowledge.md` ini HANYA diperbarui untuk keputusan yang memiliki dampak lintas tahap atau keputusan arsitektur jangka panjang.
