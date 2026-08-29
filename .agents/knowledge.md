@@ -108,10 +108,10 @@ Subscriber dapat berupa: User, Company, Organization, atau custom Eloquent model
 *(Catatan: Maintainability lebih diutamakan daripada membuat compatibility hack yang buruk.)*
 
 ## Current Development Stage
-Current Stage: Stage 8 — Subscription Management Dashboard
+Current Stage: Stage 9 — Invoice Domain
 Status: Completed
-Last Completed: Subscription index, detail view, filtering, and HTTP action wrappers for domain service. Subscriber Resolver API.
-Next Planned: Stage 9
+Last Completed: Invoice model, statuses enum, BillingManager for generating invoices and handling statuses. Collision-safe invoice numbering.
+Next Planned: Stage 10
 
 ## Architecture Decision Log
 
@@ -133,6 +133,7 @@ Next Planned: Stage 9
 | 2026-08-29 | Change Plan behavior V1. | Pindah plan langsung memutus plan lama, memulai plan baru dari `now()` tanpa proration balance otomatis, demi menjaga kompleksitas V1 tetap rendah. |
 | 2026-08-29 | Dashboard Authorization Pattern. | Otorisasi diserahkan pada Closure kustom melalui facade `JustSubs::auth()`. Secara default (jika callback tidak di-set), dashboard tertutup (403), kecuali di environment `local`. Ini menghindari expose tidak sengaja di production. |
 | 2026-08-29 | Subscriber Resolver Strategy. | Daripada menebak atau menggunakan Dynamic SQL untuk melacak `name`/`email` dari Polymorphic Subscriber, kita menyediakan Public API: `JustSubs::resolveSubscriberNameUsing(Closure)`. Default *fallback*-nya mengecek object property `name` atau `email`. |
+| 2026-08-30 | Collision-safe Invoice Numbering. | Nomor Invoice di-*generate* secara dinamis di model event `created` dengan format `INV-{YYYYMM}-{ID}` untuk menjamin `100% collision-safe` (karena `$id` dijamin unik di database). |
 
 ## Updating This File
 File `.agents/knowledge.md` ini HANYA diperbarui untuk keputusan yang memiliki dampak lintas tahap atau keputusan arsitektur jangka panjang.
