@@ -2,10 +2,17 @@
 
 namespace Ridho\JustSubs\Tests;
 
+use Illuminate\Database\Eloquent\Model;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Ridho\JustSubs\JustSubsServiceProvider;
 
-class TestCase extends Orchestra
+class DummyUser extends Model
+{
+    protected $table = 'dash_users';
+    protected $guarded = [];
+}
+
+abstract class TestCase extends Orchestra
 {
     protected function getPackageProviders($app)
     {
