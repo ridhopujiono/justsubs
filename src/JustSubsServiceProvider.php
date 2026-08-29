@@ -29,8 +29,14 @@ class JustSubsServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../database/migrations' => database_path('migrations'),
             ], 'justsubs-migrations');
+
+            $this->commands([
+                \Ridho\JustSubs\Console\InstallCommand::class,
+                \Ridho\JustSubs\Console\StatusCommand::class,
+            ]);
         }
 
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
     }
 }
