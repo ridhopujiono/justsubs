@@ -16,6 +16,7 @@ class TestCase extends Orchestra
 
     protected function getEnvironmentSetUp($app)
     {
-        // Set any environment config here
+        // Setup default config for testing
+        $app['config']->set('app.key', 'base64:Xv9u8X2wY2JmP3x5v9u8X2wY2JmP3x5v9u8X2wY2JmP=');
     }
 }
