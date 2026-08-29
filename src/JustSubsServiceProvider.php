@@ -25,6 +25,12 @@ class JustSubsServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../config/justsubs.php' => config_path('justsubs.php'),
             ], 'justsubs-config');
+
+            $this->publishes([
+                __DIR__.'/../database/migrations' => database_path('migrations'),
+            ], 'justsubs-migrations');
         }
+
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
     }
 }
