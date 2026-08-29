@@ -33,6 +33,11 @@ class Plan extends Model
         return PlanFactory::new();
     }
 
+    public function subscriptions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
     /**
      * Calculate the end date for a period starting at a given date.
      *
