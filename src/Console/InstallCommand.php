@@ -19,6 +19,9 @@ class InstallCommand extends Command
         $this->info('Publishing migrations...');
         $this->call('vendor:publish', ['--tag' => 'justsubs-migrations']);
 
+        $this->info('Publishing assets...');
+        $this->call('vendor:publish', ['--tag' => 'justsubs-assets']);
+
         $this->info('JustSubs scaffolding installed successfully.');
         $this->info('Next steps:');
         $this->info('1. Run `php artisan migrate` to create the tables.');
