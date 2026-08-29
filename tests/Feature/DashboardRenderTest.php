@@ -10,6 +10,7 @@ use Ridho\JustSubs\Models\Subscription;
 use Ridho\JustSubs\Enums\SubscriptionStatus;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Ridho\JustSubs\Tests\DummyUser;
 
 class DashboardRenderTest extends TestCase
 {
@@ -41,7 +42,7 @@ class DashboardRenderTest extends TestCase
         Plan::factory()->count(3)->create();
         
         Subscription::factory()->create([
-            'subscriber_type' => 'App\Models\User',
+            'subscriber_type' => DummyUser::class,
             'subscriber_id' => '1',
             'status' => SubscriptionStatus::Active,
             'starts_at' => now()->subDays(5),
@@ -49,7 +50,7 @@ class DashboardRenderTest extends TestCase
         ]);
         
         Subscription::factory()->create([
-            'subscriber_type' => 'App\Models\User',
+            'subscriber_type' => DummyUser::class,
             'subscriber_id' => '2',
             'status' => SubscriptionStatus::Active,
             'starts_at' => now()->subDays(5),
