@@ -20,7 +20,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Ridho\\JustSubs\\": "src/"
+            "Ridho\\JustSubs\\": "src/",
+            "Ridho\\JustSubs\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
