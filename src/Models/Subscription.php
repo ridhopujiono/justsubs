@@ -44,6 +44,11 @@ class Subscription extends Model
         return $this->morphTo();
     }
 
+    public function getSubscriberNameAttribute(): string
+    {
+        return \Ridho\JustSubs\JustSubs::getSubscriberName($this->subscriber);
+    }
+
     public function active(): bool
     {
         return $this->status === SubscriptionStatus::Active
