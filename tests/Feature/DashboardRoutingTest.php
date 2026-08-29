@@ -5,8 +5,12 @@ namespace Ridho\JustSubs\Tests\Feature;
 use Ridho\JustSubs\JustSubs;
 use Ridho\JustSubs\Tests\TestCase;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
 class DashboardRoutingTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function tearDown(): void
     {
         JustSubs::$authUsing = null;
