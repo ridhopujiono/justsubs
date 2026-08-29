@@ -39,9 +39,14 @@ class Subscription extends Model
         return $this->belongsTo(Plan::class);
     }
 
-    public function subscriber(): MorphTo
+    public function subscriber(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function invoices(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Invoice::class);
     }
 
     public function getSubscriberNameAttribute(): string
