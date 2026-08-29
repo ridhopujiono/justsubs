@@ -11,8 +11,14 @@ Route::middleware(array_merge(
 ->group(function () {
     Route::get('/', [\Ridho\JustSubs\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     
-    // Stub routes for navigation
-    Route::get('/plans', function () { return 'Plans'; })->name('plans.index');
+    // Plans
+    Route::get('/plans', [\Ridho\JustSubs\Http\Controllers\PlanController::class, 'index'])->name('plans.index');
+    Route::get('/plans/create', [\Ridho\JustSubs\Http\Controllers\PlanController::class, 'create'])->name('plans.create');
+    Route::post('/plans', [\Ridho\JustSubs\Http\Controllers\PlanController::class, 'store'])->name('plans.store');
+    Route::get('/plans/{plan}/edit', [\Ridho\JustSubs\Http\Controllers\PlanController::class, 'edit'])->name('plans.edit');
+    Route::put('/plans/{plan}', [\Ridho\JustSubs\Http\Controllers\PlanController::class, 'update'])->name('plans.update');
+    
+    // Stub routes for other navigation
     Route::get('/subscriptions', function () { return 'Subscriptions'; })->name('subscriptions.index');
     Route::get('/subscribers', function () { return 'Subscribers'; })->name('subscribers.index');
     Route::get('/invoices', function () { return 'Invoices'; })->name('invoices.index');
