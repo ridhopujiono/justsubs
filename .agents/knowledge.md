@@ -108,10 +108,10 @@ Subscriber dapat berupa: User, Company, Organization, atau custom Eloquent model
 *(Catatan: Maintainability lebih diutamakan daripada membuat compatibility hack yang buruk.)*
 
 ## Current Development Stage
-Current Stage: Planning
-Status: Context established
-Last Completed: Project architecture definition
-Next Planned: Stage 1 — Package foundation
+Current Stage: Stage 1 — Package foundation
+Status: Completed
+Last Completed: Setup composer, config, and testbench with PHPUnit
+Next Planned: Stage 2
 
 ## Architecture Decision Log
 
@@ -123,6 +123,7 @@ Next Planned: Stage 1 — Package foundation
 | 2026-08-29 | Core tidak bergantung payment provider. | Memungkinkan ekstensi dengan berbagai provider (atau manual transfer). |
 | 2026-08-29 | Dashboard merupakan bagian resmi package. | Fitur inti, bukan sekadar playground/demo. |
 | 2026-08-29 | UI tidak boleh bergantung frontend build host application. | Menjamin package bisa dipasang di project apa saja tanpa merusak stack mereka. |
+| 2026-08-29 | Menggunakan PHPUnit untuk testing. | Standar komunitas, kompatibilitas bawaan dengan Orchestra Testbench. |
 
 ## Updating This File
 File `.agents/knowledge.md` ini HANYA diperbarui untuk keputusan yang memiliki dampak lintas tahap atau keputusan arsitektur jangka panjang.
