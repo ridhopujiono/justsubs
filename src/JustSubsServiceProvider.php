@@ -34,9 +34,15 @@ class JustSubsServiceProvider extends ServiceProvider
                 \Ridho\JustSubs\Console\InstallCommand::class,
                 \Ridho\JustSubs\Console\StatusCommand::class,
             ]);
+
+            // Publish public assets
+            $this->publishes([
+                __DIR__.'/../public' => public_path('vendor/justsubs'),
+            ], 'justsubs-assets');
         }
 
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'justsubs');
     }
 }
