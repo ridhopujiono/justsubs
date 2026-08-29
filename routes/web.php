@@ -18,8 +18,15 @@ Route::middleware(array_merge(
     Route::get('/plans/{plan}/edit', [\Ridho\JustSubs\Http\Controllers\PlanController::class, 'edit'])->name('plans.edit');
     Route::put('/plans/{plan}', [\Ridho\JustSubs\Http\Controllers\PlanController::class, 'update'])->name('plans.update');
     
+    // Subscriptions
+    Route::get('/subscriptions', [\Ridho\JustSubs\Http\Controllers\SubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::get('/subscriptions/{subscription}', [\Ridho\JustSubs\Http\Controllers\SubscriptionController::class, 'show'])->name('subscriptions.show');
+    Route::post('/subscriptions/{subscription}/renew', [\Ridho\JustSubs\Http\Controllers\SubscriptionController::class, 'renew'])->name('subscriptions.renew');
+    Route::post('/subscriptions/{subscription}/extend', [\Ridho\JustSubs\Http\Controllers\SubscriptionController::class, 'extend'])->name('subscriptions.extend');
+    Route::post('/subscriptions/{subscription}/change-plan', [\Ridho\JustSubs\Http\Controllers\SubscriptionController::class, 'changePlan'])->name('subscriptions.change_plan');
+    Route::post('/subscriptions/{subscription}/cancel', [\Ridho\JustSubs\Http\Controllers\SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
+    
     // Stub routes for other navigation
-    Route::get('/subscriptions', function () { return 'Subscriptions'; })->name('subscriptions.index');
     Route::get('/subscribers', function () { return 'Subscribers'; })->name('subscribers.index');
     Route::get('/invoices', function () { return 'Invoices'; })->name('invoices.index');
     Route::get('/payments', function () { return 'Payments'; })->name('payments.index');
