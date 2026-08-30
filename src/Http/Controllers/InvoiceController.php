@@ -48,7 +48,8 @@ class InvoiceController extends Controller
         ]);
 
         try {
-            $driver = new ManualPaymentDriver();
+            $driverName = $request->input('driver', 'manual');
+            $driver = \Ridho\JustSubs\JustSubs::getPaymentDriver($driverName);
             $metadata = [];
             
             if ($request->filled('reference')) {
