@@ -1,0 +1,26 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    parallel:
+        maximumNumberOfProcesses: 1
+    level: 5
+    paths:
+        - src
+        - config
+        - database
+    ignoreErrors:
+        - '#Access to an undefined property (.*?)Model::(.*?)#'
+        - '#Access to an undefined property (.*?)Subscription::(.*?)#'
+        - '#Access to an undefined property (.*?)Plan::(.*?)#'
+        - '#Access to an undefined property (.*?)Invoice::(.*?)#'
+        - '#Access to an undefined property (.*?)Payment::(.*?)#'
+        - '#Call to an undefined method (.*?)Model::(.*?)#'
+        - '#expects view-string\|null, string given#'
+        - '#Unsafe usage of new static\(\)#'
+        - '#does not handle remaining value: mixed#'
+        - '#expects Ridho\\JustSubs\\Models\\Subscription(.*?), Illuminate\\Database\\Eloquent\\Model(.*?) given#'
+        - '#should return Ridho\\JustSubs\\Models\\Payment but returns Illuminate\\Database\\Eloquent\\Model#'
+        - '#Trait (.*?) is used zero times and is not analysed#'
+        - '#PHPDoc type string of property (.*?)Factory::\$model is not covariant#'
+    reportUnmatchedIgnoredErrors: false
