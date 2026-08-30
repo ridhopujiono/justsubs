@@ -3,30 +3,27 @@
 namespace Ridho\JustSubs\Http\Controllers;
 
 use Illuminate\Routing\Controller;
-use Ridho\JustSubs\Models\Plan;
-use Ridho\JustSubs\Models\Subscription;
-use Ridho\JustSubs\Enums\SubscriptionStatus;
+use Ridho\JustSubs\Services\AnalyticsService;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(AnalyticsService $analytics)
     {
-        $totalPlans = Plan::count();
-        
-        $activeSubscriptions = Subscription::where('status', SubscriptionStatus::Active->value)
-            ->where('ends_at', '>=', now())
-            ->where('starts_at', '<=', now())
-            ->count();
-            
-        $expiringSoon = Subscription::where('status', SubscriptionStatus::Active->value)
-            ->where('ends_at', '>=', now())
-            ->where('ends_at', '<=', now()->addDays(7))
-            ->count();
+        $startOfMonth = now()->startOfMonth();
+        $endOfMonth = now()->endOfMonth();
 
-        return view('justsubs::dashboard', [
-            'total_plans' => $totalPlans,
-            'active_subscriptions' => $activeSubscriptions,
-            'expiring_soon' => $expiringSoon,
-        ]);
+        $metrics = [
+            'active_subscriptions' => $analytics->getActiveSubscriptionsCount(),
+            'new_subscriptions' => $analytics->getNewSubscriptionsCount($startOfMonth, $endOfMonth),
+            'expiring_soon' => $analytics->getExpiringSoonCount(7),
+            'revenue_this_month' => $analytics->getRevenueReceived($startOfMonth, $endOfMonth),
+            'outstanding_invoices' => $analytics->getOutstandingInvoiceAmount(),
+            'estimated_mrr' => $analytics->getEstimatedMRR(),
+        ];
+
+        $planDistribution = $analytics->getPlanDistribution();
+
+        return view('justsubs::dashboard', compact('metrics', 'planDistribution'));
     }
 }
