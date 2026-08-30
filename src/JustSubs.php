@@ -77,4 +77,44 @@ class JustSubs
 
         return $subscriber->name ?? $subscriber->email ?? $subscriber->id ?? 'Unknown';
     }
+
+    /**
+     * Registered payment drivers.
+     *
+     * @var array
+     */
+    protected static array $paymentDrivers = [];
+
+    /**
+     * Register a custom payment driver.
+     *
+     * @param  string   $name
+     * @param  \Closure $resolver
+     * @return void
+     */
+    public static function extendPaymentDriver(string $name, Closure $resolver)
+    {
+        static::$paymentDrivers[$name] = $resolver;
+    }
+
+    /**
+     * Resolve a registered payment driver.
+     *
+     * @param  string $name
+     * @return \Ridho\JustSubs\Contracts\PaymentDriver
+     *
+     * @throws \Exception
+     */
+    public static function getPaymentDriver(string $name = 'manual')
+    {
+        if ($name === 'manual' && !isset(static::$paymentDrivers['manual'])) {
+            return new \Ridho\JustSubs\Services\PaymentDrivers\ManualPaymentDriver();
+        }
+
+        if (!isset(static::$paymentDrivers[$name])) {
+            throw new \Exception("Payment driver [{$name}] is not registered.");
+        }
+
+        return call_user_func(static::$paymentDrivers[$name]);
+    }
 }
