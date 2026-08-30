@@ -108,10 +108,10 @@ Subscriber dapat berupa: User, Company, Organization, atau custom Eloquent model
 *(Catatan: Maintainability lebih diutamakan daripada membuat compatibility hack yang buruk.)*
 
 ## Current Development Stage
-Current Stage: Stage 11 — Invoices + Payments Dashboard
+Current Stage: Stage 12 — Dashboard Analytics
 Status: Completed
-Last Completed: Dashboard views for listing and detailing invoices, marking manual payments, voiding invoices, and listing all immutable payment records.
-Next Planned: Stage 12
+Last Completed: AnalyticsService with methods for Active Subscriptions, New Subscriptions, Expiring Soon, Revenue Received, Outstanding Invoices, Estimated MRR (Normalized), and Plan Distribution. Tests for all metrics calculation logic. Updated dashboard view to display accurate real-time metrics.
+Next Planned: End of current requirements
 
 ## Architecture Decision Log
 
@@ -135,6 +135,7 @@ Next Planned: Stage 12
 | 2026-08-29 | Subscriber Resolver Strategy. | Daripada menebak atau menggunakan Dynamic SQL untuk melacak `name`/`email` dari Polymorphic Subscriber, kita menyediakan Public API: `JustSubs::resolveSubscriberNameUsing(Closure)`. Default *fallback*-nya mengecek object property `name` atau `email`. |
 | 2026-08-30 | Collision-safe Invoice Numbering. | Nomor Invoice di-*generate* secara dinamis di model event `created` dengan format `INV-{YYYYMM}-{ID}` untuk menjamin `100% collision-safe` (karena `$id` dijamin unik di database). |
 | 2026-08-30 | Payment Driver Contract. | Domain Payment dibuat independen (`PaymentDriver`) tanpa hard-code Midtrans/Stripe. Operasi pembayaran diletakkan di `BillingManager` dengan jaminan transaksi (`DB::transaction`) dan pencegahan duplikasi bayar (idempotency throw `PaymentFailedException`). |
+| 2026-08-30 | MRR Normalization. | Metric MRR (Monthly Recurring Revenue) dihitung berdasarkan normalisasi matematika sederhana: Harian (`*30`), Mingguan (`*4.33`), Bulanan (`/count`), dan Tahunan (`/12`). Hal ini direpresentasikan di `AnalyticsService::getEstimatedMRR`. |
 
 ## Updating This File
 File `.agents/knowledge.md` ini HANYA diperbarui untuk keputusan yang memiliki dampak lintas tahap atau keputusan arsitektur jangka panjang.
