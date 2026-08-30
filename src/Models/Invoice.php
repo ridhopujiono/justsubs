@@ -53,4 +53,9 @@ class Invoice extends Model
     {
         return $this->belongsTo(Subscription::class);
     }
+
+    public function payments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
 }
