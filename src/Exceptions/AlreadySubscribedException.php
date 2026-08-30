@@ -8,6 +8,6 @@ class AlreadySubscribedException extends Exception
 {
     public static function forSubscriber($subscriber)
     {
-        return new self("Subscriber already has an active subscription.");
+        return new self('Subscriber already has an active subscription.');
     }
 }

@@ -4,6 +4,7 @@ namespace Ridho\JustSubs\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Ridho\JustSubs\JustSubs;
 
 class Authorize
@@ -11,9 +12,7 @@ class Authorize
     /**
      * Handle the incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return \Illuminate\Http\Response|mixed
+     * @return Response|mixed
      */
     public function handle(Request $request, Closure $next)
     {

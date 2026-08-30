@@ -4,6 +4,7 @@ namespace Ridho\JustSubs\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Ridho\JustSubs\Database\Factories\PlanFactory;
@@ -33,18 +34,15 @@ class Plan extends Model
         return PlanFactory::new();
     }
 
-    public function subscriptions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);
     }
 
     /**
      * Calculate the end date for a period starting at a given date.
-     *
-     * @param Carbon|null $start
-     * @return Carbon
      */
-    public function calculateNextPeriodEnd(Carbon $start = null): Carbon
+    public function calculateNextPeriodEnd(?Carbon $start = null): Carbon
     {
         $start = $start ? $start->copy() : now();
 

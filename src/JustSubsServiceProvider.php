@@ -3,6 +3,8 @@
 namespace Ridho\JustSubs;
 
 use Illuminate\Support\ServiceProvider;
+use Ridho\JustSubs\Console\InstallCommand;
+use Ridho\JustSubs\Console\StatusCommand;
 
 class JustSubsServiceProvider extends ServiceProvider
 {
@@ -31,8 +33,8 @@ class JustSubsServiceProvider extends ServiceProvider
             ], 'justsubs-migrations');
 
             $this->commands([
-                \Ridho\JustSubs\Console\InstallCommand::class,
-                \Ridho\JustSubs\Console\StatusCommand::class,
+                InstallCommand::class,
+                StatusCommand::class,
             ]);
 
             // Publish public assets

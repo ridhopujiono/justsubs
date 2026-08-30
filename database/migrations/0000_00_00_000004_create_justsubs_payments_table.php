@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -15,18 +15,18 @@ return new class extends Migration
         Schema::create($paymentsTable, function (Blueprint $table) use ($invoicesTable) {
             $table->id();
             $table->foreignId('invoice_id')->constrained($invoicesTable)->cascadeOnDelete();
-            
+
             $table->string('provider');
             $table->string('provider_reference')->nullable();
-            
+
             $table->bigInteger('amount'); // Smallest unit
             $table->string('currency', 3)->default('IDR');
-            
+
             $table->string('status')->default('pending');
             $table->timestamp('paid_at')->nullable();
-            
+
             $table->json('metadata')->nullable();
-            
+
             $table->timestamps();
         });
     }

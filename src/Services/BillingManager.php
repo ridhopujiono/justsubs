@@ -3,9 +3,16 @@
 namespace Ridho\JustSubs\Services;
 
 use Illuminate\Support\Facades\DB;
-use Ridho\JustSubs\Models\Invoice;
-use Ridho\JustSubs\Models\Subscription;
+use Ridho\JustSubs\Contracts\PaymentDriver;
 use Ridho\JustSubs\Enums\InvoiceStatus;
+use Ridho\JustSubs\Enums\PaymentStatus;
+use Ridho\JustSubs\Enums\SubscriptionStatus;
+use Ridho\JustSubs\Events\InvoicePaid;
+use Ridho\JustSubs\Events\PaymentReceived;
+use Ridho\JustSubs\Events\SubscriptionActivated;
+use Ridho\JustSubs\Models\Invoice;
+use Ridho\JustSubs\Models\Payment;
+use Ridho\JustSubs\Models\Subscription;
 
 class BillingManager
 {
@@ -30,28 +37,28 @@ class BillingManager
         });
     }
 
-    public function processPayment(Invoice $invoice, \Ridho\JustSubs\Contracts\PaymentDriver $driver, int $amount, string $currency, array $metadata = []): \Ridho\JustSubs\Models\Payment
+    public function processPayment(Invoice $invoice, PaymentDriver $driver, int $amount, string $currency, array $metadata = []): Payment
     {
         return DB::transaction(function () use ($invoice, $driver, $amount, $currency, $metadata) {
             $payment = $driver->process($invoice, $amount, $currency, $metadata);
 
-            \Ridho\JustSubs\Events\PaymentReceived::dispatch($payment);
+            PaymentReceived::dispatch($payment);
 
-            if ($payment->status === \Ridho\JustSubs\Enums\PaymentStatus::Success) {
+            if ($payment->status === PaymentStatus::Success) {
                 $this->markAsPaid($invoice);
-                
+
                 if ($invoice->subscription_id) {
                     $subscription = $invoice->subscription;
-                    
-                    if ($subscription->status === \Ridho\JustSubs\Enums\SubscriptionStatus::Pending) {
-                        $subscription->status = \Ridho\JustSubs\Enums\SubscriptionStatus::Active;
+
+                    if ($subscription->status === SubscriptionStatus::Pending) {
+                        $subscription->status = SubscriptionStatus::Active;
                         $subscription->starts_at = now();
                         $subscription->ends_at = $subscription->plan->calculateNextPeriodEnd(now());
                         $subscription->save();
-                        
-                        \Ridho\JustSubs\Events\SubscriptionActivated::dispatch($subscription);
+
+                        SubscriptionActivated::dispatch($subscription);
                     } else {
-                        app(\Ridho\JustSubs\Services\SubscriptionManager::class)->renew($subscription);
+                        app(SubscriptionManager::class)->renew($subscription);
                     }
                 }
             }
@@ -74,7 +81,7 @@ class BillingManager
             $invoice->paid_at = now();
             $invoice->save();
 
-            \Ridho\JustSubs\Events\InvoicePaid::dispatch($invoice);
+            InvoicePaid::dispatch($invoice);
 
             return $invoice;
         });

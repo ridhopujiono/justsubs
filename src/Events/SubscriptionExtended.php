@@ -10,7 +10,5 @@ class SubscriptionExtended
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public Subscription $subscription)
-    {
-    }
+    public function __construct(public Subscription $subscription) {}
 }

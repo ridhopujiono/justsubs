@@ -3,9 +3,9 @@
 namespace Ridho\JustSubs\Concerns;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Ridho\JustSubs\Models\Subscription;
-use Ridho\JustSubs\Models\Plan;
 use Ridho\JustSubs\Enums\SubscriptionStatus;
+use Ridho\JustSubs\Models\Plan;
+use Ridho\JustSubs\Models\Subscription;
 
 trait HasSubscriptions
 {
@@ -33,7 +33,7 @@ trait HasSubscriptions
     {
         $subscription = $this->activeSubscription();
 
-        if (!$subscription) {
+        if (! $subscription) {
             return false;
         }
 

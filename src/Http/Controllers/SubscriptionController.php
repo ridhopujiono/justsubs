@@ -4,11 +4,11 @@ namespace Ridho\JustSubs\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Ridho\JustSubs\Models\Subscription;
-use Ridho\JustSubs\Models\Plan;
-use Ridho\JustSubs\Services\SubscriptionManager;
-use Ridho\JustSubs\Enums\IntervalUnit;
 use Illuminate\Validation\Rule;
+use Ridho\JustSubs\Enums\IntervalUnit;
+use Ridho\JustSubs\Models\Plan;
+use Ridho\JustSubs\Models\Subscription;
+use Ridho\JustSubs\Services\SubscriptionManager;
 
 class SubscriptionController extends Controller
 {

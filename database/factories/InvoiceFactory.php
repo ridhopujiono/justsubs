@@ -3,8 +3,8 @@
 namespace Ridho\JustSubs\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Ridho\JustSubs\Models\Invoice;
 use Ridho\JustSubs\Enums\InvoiceStatus;
+use Ridho\JustSubs\Models\Invoice;
 
 class InvoiceFactory extends Factory
 {

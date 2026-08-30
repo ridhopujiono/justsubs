@@ -4,11 +4,11 @@ namespace Ridho\JustSubs\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Ridho\JustSubs\Models\Invoice;
-use Ridho\JustSubs\Services\BillingManager;
-use Ridho\JustSubs\Services\PaymentDrivers\ManualPaymentDriver;
 use Ridho\JustSubs\Enums\InvoiceStatus;
 use Ridho\JustSubs\Exceptions\PaymentFailedException;
+use Ridho\JustSubs\JustSubs;
+use Ridho\JustSubs\Models\Invoice;
+use Ridho\JustSubs\Services\BillingManager;
 
 class InvoiceController extends Controller
 {
@@ -49,18 +49,18 @@ class InvoiceController extends Controller
 
         try {
             $driverName = $request->input('driver', 'manual');
-            $driver = \Ridho\JustSubs\JustSubs::getPaymentDriver($driverName);
+            $driver = JustSubs::getPaymentDriver($driverName);
             $metadata = [];
-            
+
             if ($request->filled('reference')) {
                 $metadata['reference'] = $request->reference;
             }
 
             $this->manager->processPayment(
-                $invoice, 
-                $driver, 
-                $invoice->amount, 
-                $invoice->currency, 
+                $invoice,
+                $driver,
+                $invoice->amount,
+                $invoice->currency,
                 $metadata
             );
 

@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 class InstallCommand extends Command
 {
     protected $signature = 'justsubs:install';
+
     protected $description = 'Install the JustSubs package';
 
     public function handle()

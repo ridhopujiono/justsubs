@@ -5,10 +5,12 @@ namespace Ridho\JustSubs\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Config;
 use Ridho\JustSubs\Database\Factories\SubscriptionFactory;
 use Ridho\JustSubs\Enums\SubscriptionStatus;
+use Ridho\JustSubs\JustSubs;
 
 class Subscription extends Model
 {
@@ -39,19 +41,19 @@ class Subscription extends Model
         return $this->belongsTo(Plan::class);
     }
 
-    public function subscriber(): \Illuminate\Database\Eloquent\Relations\MorphTo
+    public function subscriber(): MorphTo
     {
         return $this->morphTo();
     }
 
-    public function invoices(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
     }
 
     public function getSubscriberNameAttribute(): string
     {
-        return \Ridho\JustSubs\JustSubs::getSubscriberName($this->subscriber);
+        return JustSubs::getSubscriberName($this->subscriber);
     }
 
     public function active(): bool
@@ -69,6 +71,6 @@ class Subscription extends Model
 
     public function cancelled(): bool
     {
-        return $this->status === SubscriptionStatus::Cancelled || !is_null($this->cancelled_at);
+        return $this->status === SubscriptionStatus::Cancelled || ! is_null($this->cancelled_at);
     }
 }

@@ -3,8 +3,8 @@
 namespace Ridho\JustSubs\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Ridho\JustSubs\Models\Plan;
 use Ridho\JustSubs\Enums\IntervalUnit;
+use Ridho\JustSubs\Models\Plan;
 
 class PlanFactory extends Factory
 {

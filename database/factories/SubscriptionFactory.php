@@ -3,9 +3,9 @@
 namespace Ridho\JustSubs\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Ridho\JustSubs\Models\Subscription;
-use Ridho\JustSubs\Models\Plan;
 use Ridho\JustSubs\Enums\SubscriptionStatus;
+use Ridho\JustSubs\Models\Plan;
+use Ridho\JustSubs\Models\Subscription;
 
 class SubscriptionFactory extends Factory
 {

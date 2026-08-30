@@ -10,7 +10,5 @@ class SubscriptionPlanChanged
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public Subscription $subscription, public mixed $oldPlanId)
-    {
-    }
+    public function __construct(public Subscription $subscription, public mixed $oldPlanId) {}
 }

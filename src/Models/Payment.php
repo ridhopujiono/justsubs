@@ -2,8 +2,9 @@
 
 namespace Ridho\JustSubs\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Config;
 use Ridho\JustSubs\Enums\PaymentStatus;
 
@@ -25,7 +26,7 @@ class Payment extends Model
         return Config::get('justsubs.tables.payments', 'justsubs_payments');
     }
 
-    public function invoice(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
     }

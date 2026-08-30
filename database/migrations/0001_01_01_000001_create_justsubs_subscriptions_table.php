@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -11,18 +11,18 @@ return new class extends Migration
     {
         Schema::create(Config::get('justsubs.tables.subscriptions', 'justsubs_subscriptions'), function (Blueprint $table) {
             $table->id();
-            
+
             $table->string('subscriber_type');
             $table->string('subscriber_id');
             $table->index(['subscriber_type', 'subscriber_id']);
 
             $table->foreignId('plan_id')->constrained(Config::get('justsubs.tables.plans', 'justsubs_plans'))->cascadeOnDelete();
-            
+
             $table->string('status');
             $table->timestamp('starts_at')->nullable();
             $table->timestamp('ends_at')->nullable();
             $table->timestamp('cancelled_at')->nullable();
-            
+
             $table->json('metadata')->nullable();
             $table->timestamps();
         });

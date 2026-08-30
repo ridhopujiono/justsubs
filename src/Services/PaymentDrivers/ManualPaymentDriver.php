@@ -4,11 +4,11 @@ namespace Ridho\JustSubs\Services\PaymentDrivers;
 
 use Illuminate\Support\Facades\DB;
 use Ridho\JustSubs\Contracts\PaymentDriver;
+use Ridho\JustSubs\Enums\InvoiceStatus;
+use Ridho\JustSubs\Enums\PaymentStatus;
+use Ridho\JustSubs\Exceptions\PaymentFailedException;
 use Ridho\JustSubs\Models\Invoice;
 use Ridho\JustSubs\Models\Payment;
-use Ridho\JustSubs\Enums\PaymentStatus;
-use Ridho\JustSubs\Enums\InvoiceStatus;
-use Ridho\JustSubs\Exceptions\PaymentFailedException;
 
 class ManualPaymentDriver implements PaymentDriver
 {

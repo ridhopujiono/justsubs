@@ -4,12 +4,13 @@ namespace Ridho\JustSubs\Services;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Ridho\JustSubs\Models\Invoice;
-use Ridho\JustSubs\Models\Payment;
-use Ridho\JustSubs\Models\Subscription;
-use Ridho\JustSubs\Enums\SubscriptionStatus;
 use Ridho\JustSubs\Enums\InvoiceStatus;
 use Ridho\JustSubs\Enums\PaymentStatus;
+use Ridho\JustSubs\Enums\SubscriptionStatus;
+use Ridho\JustSubs\Models\Invoice;
+use Ridho\JustSubs\Models\Payment;
+use Ridho\JustSubs\Models\Plan;
+use Ridho\JustSubs\Models\Subscription;
 
 class AnalyticsService
 {
@@ -100,13 +101,15 @@ class AnalyticsService
             return 0;
         }
 
-        $plans = \Ridho\JustSubs\Models\Plan::whereIn('id', $planCounts->pluck('plan_id'))->get()->keyBy('id');
+        $plans = Plan::whereIn('id', $planCounts->pluck('plan_id'))->get()->keyBy('id');
 
         $mrr = 0;
 
         foreach ($planCounts as $row) {
             $plan = $plans->get($row->plan_id);
-            if (!$plan) continue;
+            if (! $plan) {
+                continue;
+            }
 
             $price = $plan->price;
             $count = $plan->interval_count;

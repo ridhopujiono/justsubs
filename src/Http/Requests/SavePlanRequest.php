@@ -3,9 +3,9 @@
 namespace Ridho\JustSubs\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Validation\Rule;
 use Ridho\JustSubs\Enums\IntervalUnit;
-use Illuminate\Support\Facades\Config;
 
 class SavePlanRequest extends FormRequest
 {

@@ -4,7 +4,6 @@ namespace Ridho\JustSubs\Http\Controllers;
 
 use Illuminate\Routing\Controller;
 use Ridho\JustSubs\Services\AnalyticsService;
-use Carbon\Carbon;
 
 class DashboardController extends Controller
 {

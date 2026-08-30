@@ -3,9 +3,10 @@
 namespace Ridho\JustSubs\Http\Controllers;
 
 use Illuminate\Routing\Controller;
-use Ridho\JustSubs\Models\Plan;
-use Ridho\JustSubs\Http\Requests\SavePlanRequest;
+use Ridho\JustSubs\Enums\IntervalUnit;
 use Ridho\JustSubs\Enums\SubscriptionStatus;
+use Ridho\JustSubs\Http\Requests\SavePlanRequest;
+use Ridho\JustSubs\Models\Plan;
 
 class PlanController extends Controller
 {
@@ -13,8 +14,8 @@ class PlanController extends Controller
     {
         $plans = Plan::withCount(['subscriptions' => function ($query) {
             $query->where('status', SubscriptionStatus::Active->value)
-                  ->where('starts_at', '<=', now())
-                  ->where('ends_at', '>=', now());
+                ->where('starts_at', '<=', now())
+                ->where('ends_at', '>=', now());
         }])->orderBy('id', 'desc')->paginate(20);
 
         return view('justsubs::plans.index', compact('plans'));
@@ -25,7 +26,7 @@ class PlanController extends Controller
         $plan = new Plan([
             'currency' => 'IDR',
             'interval_count' => 1,
-            'interval_unit' => \Ridho\JustSubs\Enums\IntervalUnit::Month,
+            'interval_unit' => IntervalUnit::Month,
             'is_active' => true,
         ]);
 
@@ -64,8 +65,9 @@ class PlanController extends Controller
         if (empty(trim($features))) {
             return [];
         }
-        
+
         $lines = explode("\n", str_replace("\r\n", "\n", $features));
+
         return array_values(array_filter(array_map('trim', $lines)));
     }
 }

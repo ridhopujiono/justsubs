@@ -3,20 +3,21 @@
 namespace Ridho\JustSubs;
 
 use Closure;
+use Illuminate\Http\Request;
+use Ridho\JustSubs\Contracts\PaymentDriver;
+use Ridho\JustSubs\Services\PaymentDrivers\ManualPaymentDriver;
 
 class JustSubs
 {
     /**
      * The callback that should be used to authenticate dashboard users.
-     *
-     * @var \Closure|null
      */
     public static ?Closure $authUsing = null;
 
     /**
      * Determine if the given request can access the dashboard.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return bool
      */
     public static function check($request)
@@ -29,7 +30,6 @@ class JustSubs
     /**
      * Set the callback that should be used to authenticate dashboard users.
      *
-     * @param  \Closure  $callback
      * @return static
      */
     public static function auth(Closure $callback)
@@ -41,15 +41,12 @@ class JustSubs
 
     /**
      * The callback that should be used to resolve subscriber display names.
-     *
-     * @var \Closure|null
      */
     public static ?Closure $subscriberNameResolver = null;
 
     /**
      * Set the callback that should be used to resolve subscriber names.
      *
-     * @param  \Closure  $callback
      * @return static
      */
     public static function resolveSubscriberNameUsing(Closure $callback)
@@ -63,7 +60,6 @@ class JustSubs
      * Get the display name for a subscriber.
      *
      * @param  mixed  $subscriber
-     * @return string
      */
     public static function getSubscriberName($subscriber): string
     {
@@ -80,16 +76,12 @@ class JustSubs
 
     /**
      * Registered payment drivers.
-     *
-     * @var array
      */
     protected static array $paymentDrivers = [];
 
     /**
      * Register a custom payment driver.
      *
-     * @param  string   $name
-     * @param  \Closure $resolver
      * @return void
      */
     public static function extendPaymentDriver(string $name, Closure $resolver)
@@ -100,18 +92,17 @@ class JustSubs
     /**
      * Resolve a registered payment driver.
      *
-     * @param  string $name
-     * @return \Ridho\JustSubs\Contracts\PaymentDriver
+     * @return PaymentDriver
      *
      * @throws \Exception
      */
     public static function getPaymentDriver(string $name = 'manual')
     {
-        if ($name === 'manual' && !isset(static::$paymentDrivers['manual'])) {
-            return new \Ridho\JustSubs\Services\PaymentDrivers\ManualPaymentDriver();
+        if ($name === 'manual' && ! isset(static::$paymentDrivers['manual'])) {
+            return new ManualPaymentDriver;
         }
 
-        if (!isset(static::$paymentDrivers[$name])) {
+        if (! isset(static::$paymentDrivers[$name])) {
             throw new \Exception("Payment driver [{$name}] is not registered.");
         }
 

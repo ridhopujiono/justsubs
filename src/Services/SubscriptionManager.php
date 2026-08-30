@@ -3,11 +3,17 @@
 namespace Ridho\JustSubs\Services;
 
 use Illuminate\Support\Facades\DB;
+use Ridho\JustSubs\Enums\IntervalUnit;
+use Ridho\JustSubs\Enums\SubscriptionStatus;
+use Ridho\JustSubs\Events\SubscriptionCancelled;
+use Ridho\JustSubs\Events\SubscriptionCreated;
+use Ridho\JustSubs\Events\SubscriptionExpired;
+use Ridho\JustSubs\Events\SubscriptionExtended;
+use Ridho\JustSubs\Events\SubscriptionPlanChanged;
+use Ridho\JustSubs\Events\SubscriptionRenewed;
+use Ridho\JustSubs\Exceptions\AlreadySubscribedException;
 use Ridho\JustSubs\Models\Plan;
 use Ridho\JustSubs\Models\Subscription;
-use Ridho\JustSubs\Enums\SubscriptionStatus;
-use Ridho\JustSubs\Events\SubscriptionCreated;
-use Ridho\JustSubs\Exceptions\AlreadySubscribedException;
 
 class SubscriptionManager
 {
@@ -58,7 +64,7 @@ class SubscriptionManager
 
             $subscription->save();
 
-            \Ridho\JustSubs\Events\SubscriptionRenewed::dispatch($subscription);
+            SubscriptionRenewed::dispatch($subscription);
 
             return $subscription;
         });
@@ -68,25 +74,25 @@ class SubscriptionManager
      * Extend a subscription manually by a specific duration.
      */
     public function extend(
-        Subscription $subscription, 
-        int $count, 
-        \Ridho\JustSubs\Enums\IntervalUnit $unit, 
+        Subscription $subscription,
+        int $count,
+        IntervalUnit $unit,
         ?string $reason = null
     ): Subscription {
-        if (!$subscription->ends_at) {
+        if (! $subscription->ends_at) {
             throw new \InvalidArgumentException('Cannot extend a subscription that has not started yet.');
         }
 
         return DB::transaction(function () use ($subscription, $count, $unit, $reason) {
             $modifier = match ($unit) {
-                \Ridho\JustSubs\Enums\IntervalUnit::Day => 'addDays',
-                \Ridho\JustSubs\Enums\IntervalUnit::Week => 'addWeeks',
-                \Ridho\JustSubs\Enums\IntervalUnit::Month => 'addMonths',
-                \Ridho\JustSubs\Enums\IntervalUnit::Year => 'addYears',
+                IntervalUnit::Day => 'addDays',
+                IntervalUnit::Week => 'addWeeks',
+                IntervalUnit::Month => 'addMonths',
+                IntervalUnit::Year => 'addYears',
             };
-            
+
             $subscription->ends_at = $subscription->ends_at->$modifier($count);
-            
+
             if ($reason) {
                 $metadata = $subscription->metadata ?? [];
                 $metadata['extensions'][] = [
@@ -100,7 +106,7 @@ class SubscriptionManager
 
             $subscription->save();
 
-            \Ridho\JustSubs\Events\SubscriptionExtended::dispatch($subscription);
+            SubscriptionExtended::dispatch($subscription);
 
             return $subscription;
         });
@@ -108,9 +114,8 @@ class SubscriptionManager
 
     /**
      * Cancel a subscription.
-     * 
-     * @param Subscription $subscription
-     * @param bool $immediately If true, revokes access instantly. If false, gracefully waits until ends_at.
+     *
+     * @param  bool  $immediately  If true, revokes access instantly. If false, gracefully waits until ends_at.
      */
     public function cancel(Subscription $subscription, bool $immediately = false): Subscription
     {
@@ -128,7 +133,7 @@ class SubscriptionManager
 
             $subscription->save();
 
-            \Ridho\JustSubs\Events\SubscriptionCancelled::dispatch($subscription);
+            SubscriptionCancelled::dispatch($subscription);
 
             return $subscription;
         });
@@ -142,7 +147,7 @@ class SubscriptionManager
         if ($subscription->ends_at->isPast() && $subscription->status !== SubscriptionStatus::Expired) {
             $subscription->status = SubscriptionStatus::Expired;
             $subscription->save();
-            \Ridho\JustSubs\Events\SubscriptionExpired::dispatch($subscription);
+            SubscriptionExpired::dispatch($subscription);
         }
 
         return $subscription;
@@ -155,7 +160,7 @@ class SubscriptionManager
     {
         return DB::transaction(function () use ($subscription, $newPlan) {
             $oldPlanId = $subscription->plan_id;
-            
+
             $subscription->plan_id = $newPlan->id;
             $subscription->status = SubscriptionStatus::Active;
             $subscription->starts_at = now();
@@ -163,7 +168,7 @@ class SubscriptionManager
             $subscription->cancelled_at = null;
             $subscription->save();
 
-            \Ridho\JustSubs\Events\SubscriptionPlanChanged::dispatch($subscription, $oldPlanId);
+            SubscriptionPlanChanged::dispatch($subscription, $oldPlanId);
 
             return $subscription;
         });

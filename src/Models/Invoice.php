@@ -2,8 +2,11 @@
 
 namespace Ridho\JustSubs\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Config;
 use Ridho\JustSubs\Database\Factories\InvoiceFactory;
 use Ridho\JustSubs\Enums\InvoiceStatus;
@@ -38,23 +41,23 @@ class Invoice extends Model
         // Format: INV-YYYYMM-{ID}
         static::created(function ($invoice) {
             if (empty($invoice->invoice_number)) {
-                $invoice->invoice_number = 'INV-' . now()->format('Ym') . '-' . str_pad($invoice->id, 5, '0', STR_PAD_LEFT);
+                $invoice->invoice_number = 'INV-'.now()->format('Ym').'-'.str_pad($invoice->id, 5, '0', STR_PAD_LEFT);
                 $invoice->saveQuietly(); // Use saveQuietly to prevent re-triggering events
             }
         });
     }
 
-    public function subscriber(): \Illuminate\Database\Eloquent\Relations\MorphTo
+    public function subscriber(): MorphTo
     {
         return $this->morphTo();
     }
 
-    public function subscription(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function subscription(): BelongsTo
     {
         return $this->belongsTo(Subscription::class);
     }
 
-    public function payments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
     }
