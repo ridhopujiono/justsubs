@@ -89,16 +89,23 @@ class AnalyticsService
      */
     public function getEstimatedMRR(): int
     {
-        $activeSubs = Subscription::with('plan')
-            ->where('status', SubscriptionStatus::Active->value)
+        $planCounts = Subscription::where('status', SubscriptionStatus::Active->value)
             ->where('starts_at', '<=', now())
             ->where('ends_at', '>=', now())
+            ->select('plan_id', DB::raw('COUNT(*) as active_count'))
+            ->groupBy('plan_id')
             ->get();
+
+        if ($planCounts->isEmpty()) {
+            return 0;
+        }
+
+        $plans = \Ridho\JustSubs\Models\Plan::whereIn('id', $planCounts->pluck('plan_id'))->get()->keyBy('id');
 
         $mrr = 0;
 
-        foreach ($activeSubs as $sub) {
-            $plan = $sub->plan;
+        foreach ($planCounts as $row) {
+            $plan = $plans->get($row->plan_id);
             if (!$plan) continue;
 
             $price = $plan->price;
@@ -117,7 +124,7 @@ class AnalyticsService
                 $normalizedPrice = $price / ($count * 12);
             }
 
-            $mrr += $normalizedPrice;
+            $mrr += $normalizedPrice * $row->active_count;
         }
 
         return (int) round($mrr);
