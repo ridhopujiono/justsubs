@@ -30,17 +30,51 @@ class BillingManager
         });
     }
 
+    public function processPayment(Invoice $invoice, \Ridho\JustSubs\Contracts\PaymentDriver $driver, int $amount, string $currency, array $metadata = []): \Ridho\JustSubs\Models\Payment
+    {
+        return DB::transaction(function () use ($invoice, $driver, $amount, $currency, $metadata) {
+            $payment = $driver->process($invoice, $amount, $currency, $metadata);
+
+            \Ridho\JustSubs\Events\PaymentReceived::dispatch($payment);
+
+            if ($payment->status === \Ridho\JustSubs\Enums\PaymentStatus::Success) {
+                $this->markAsPaid($invoice);
+                
+                if ($invoice->subscription_id) {
+                    $subscription = $invoice->subscription;
+                    
+                    if ($subscription->status === \Ridho\JustSubs\Enums\SubscriptionStatus::Pending) {
+                        $subscription->status = \Ridho\JustSubs\Enums\SubscriptionStatus::Active;
+                        $subscription->starts_at = now();
+                        $subscription->ends_at = $subscription->plan->calculateNextPeriodEnd(now());
+                        $subscription->save();
+                        
+                        \Ridho\JustSubs\Events\SubscriptionActivated::dispatch($subscription);
+                    } else {
+                        app(\Ridho\JustSubs\Services\SubscriptionManager::class)->renew($subscription);
+                    }
+                }
+            }
+
+            return $payment;
+        });
+    }
+
     /**
      * Mark an invoice as paid.
-     * Note: This does NOT automatically activate subscriptions.
-     * Subscription activation should be handled by a higher-level workflow or event listener.
      */
     public function markAsPaid(Invoice $invoice): Invoice
     {
         return DB::transaction(function () use ($invoice) {
+            if ($invoice->status === InvoiceStatus::Paid) {
+                return $invoice;
+            }
+
             $invoice->status = InvoiceStatus::Paid;
             $invoice->paid_at = now();
             $invoice->save();
+
+            \Ridho\JustSubs\Events\InvoicePaid::dispatch($invoice);
 
             return $invoice;
         });
