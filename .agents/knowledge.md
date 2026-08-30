@@ -108,10 +108,10 @@ Subscriber dapat berupa: User, Company, Organization, atau custom Eloquent model
 *(Catatan: Maintainability lebih diutamakan daripada membuat compatibility hack yang buruk.)*
 
 ## Current Development Stage
-Current Stage: Stage 10 — Payment Domain & Manual Driver
+Current Stage: Stage 11 — Invoices + Payments Dashboard
 Status: Completed
-Last Completed: PaymentDriver contract, ManualPaymentDriver, Payment model & migrations, transaction workflows in BillingManager, idempotency via PaymentFailedException.
-Next Planned: Stage 11
+Last Completed: Dashboard views for listing and detailing invoices, marking manual payments, voiding invoices, and listing all immutable payment records.
+Next Planned: Stage 12
 
 ## Architecture Decision Log
 
