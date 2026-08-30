@@ -19,8 +19,8 @@ return new class extends Migration
             $table->foreignId('plan_id')->constrained(Config::get('justsubs.tables.plans', 'justsubs_plans'))->cascadeOnDelete();
             
             $table->string('status');
-            $table->timestamp('starts_at');
-            $table->timestamp('ends_at');
+            $table->timestamp('starts_at')->nullable();
+            $table->timestamp('ends_at')->nullable();
             $table->timestamp('cancelled_at')->nullable();
             
             $table->json('metadata')->nullable();
