@@ -73,6 +73,10 @@ class SubscriptionManager
         \Ridho\JustSubs\Enums\IntervalUnit $unit, 
         ?string $reason = null
     ): Subscription {
+        if (!$subscription->ends_at) {
+            throw new \InvalidArgumentException('Cannot extend a subscription that has not started yet.');
+        }
+
         return DB::transaction(function () use ($subscription, $count, $unit, $reason) {
             $modifier = match ($unit) {
                 \Ridho\JustSubs\Enums\IntervalUnit::Day => 'addDays',
