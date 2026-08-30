@@ -249,3 +249,23 @@ No prior versions exist. The first release candidate is `v0.1.0`. Wait for the 1
 ## License
 
 The MIT License (MIT).
+
+## Contributing
+
+If you wish to contribute to JustSubs, you can run the following commands to ensure your code meets the quality gate requirements:
+
+```bash
+composer install
+
+# Run tests
+composer test
+
+# Fix code formatting
+composer format
+
+# Run static analysis
+composer analyse
+
+# Run all quality checks (Validate, Format Check, Static Analysis, Tests)
+composer quality
+```
