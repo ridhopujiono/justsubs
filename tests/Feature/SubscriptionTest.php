@@ -3,10 +3,11 @@
 namespace Ridho\JustSubs\Tests\Feature;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Str;
 use Ridho\JustSubs\Concerns\HasSubscriptions;
 use Ridho\JustSubs\Enums\SubscriptionStatus;
 use Ridho\JustSubs\Events\SubscriptionCreated;
@@ -15,7 +16,6 @@ use Ridho\JustSubs\Models\Plan;
 use Ridho\JustSubs\Models\Subscription;
 use Ridho\JustSubs\Services\SubscriptionManager;
 use Ridho\JustSubs\Tests\TestCase;
-use Illuminate\Support\Str;
 
 class SubscriptionTest extends TestCase
 {
@@ -24,7 +24,7 @@ class SubscriptionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         Schema::create('dummy_users', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
@@ -41,10 +41,10 @@ class SubscriptionTest extends TestCase
         $user = DummyUser::create();
         $plan = Plan::factory()->create();
 
-        $manager = new SubscriptionManager();
+        $manager = new SubscriptionManager;
         $subscription = $manager->subscribe($user, $plan);
 
-        $this->assertEquals((string)$user->id, $subscription->subscriber_id);
+        $this->assertEquals((string) $user->id, $subscription->subscriber_id);
         $this->assertEquals(DummyUser::class, $subscription->subscriber_type);
         $this->assertTrue($user->subscribed());
     }
@@ -54,7 +54,7 @@ class SubscriptionTest extends TestCase
         $user = DummyUuidUser::create(['id' => Str::uuid()->toString()]);
         $plan = Plan::factory()->create();
 
-        $manager = new SubscriptionManager();
+        $manager = new SubscriptionManager;
         $subscription = $manager->subscribe($user, $plan);
 
         $this->assertEquals($user->id, $subscription->subscriber_id);
@@ -67,7 +67,7 @@ class SubscriptionTest extends TestCase
         $user = DummyUser::create();
         $plan = Plan::factory()->create();
 
-        $manager = new SubscriptionManager();
+        $manager = new SubscriptionManager;
         $manager->subscribe($user, $plan);
 
         $this->expectException(AlreadySubscribedException::class);
@@ -81,7 +81,7 @@ class SubscriptionTest extends TestCase
         $user = DummyUser::create();
         $plan = Plan::factory()->create(['slug' => 'pro']);
 
-        $manager = new SubscriptionManager();
+        $manager = new SubscriptionManager;
         $subscription = $manager->subscribe($user, $plan);
 
         Event::assertDispatched(SubscriptionCreated::class, function ($e) use ($subscription) {
@@ -91,7 +91,7 @@ class SubscriptionTest extends TestCase
         $this->assertTrue($user->subscribed());
         $this->assertTrue($user->subscribedTo('pro'));
         $this->assertTrue($user->subscribedTo($plan));
-        
+
         $this->assertNotNull($user->activeSubscription());
         $this->assertTrue($subscription->active());
     }
@@ -99,13 +99,13 @@ class SubscriptionTest extends TestCase
     public function test_future_subscription_is_not_active()
     {
         $this->travelTo(now());
-        
+
         $user = DummyUser::create();
         $plan = Plan::factory()->create();
-        
+
         $subscription = Subscription::factory()->create([
             'subscriber_type' => DummyUser::class,
-            'subscriber_id' => (string)$user->id,
+            'subscriber_id' => (string) $user->id,
             'plan_id' => $plan->id,
             'status' => SubscriptionStatus::Active,
             'starts_at' => now()->addDays(2),
@@ -119,13 +119,13 @@ class SubscriptionTest extends TestCase
     public function test_expired_subscription_is_not_active()
     {
         $this->travelTo(now());
-        
+
         $user = DummyUser::create();
         $plan = Plan::factory()->create();
-        
+
         $subscription = Subscription::factory()->create([
             'subscriber_type' => DummyUser::class,
-            'subscriber_id' => (string)$user->id,
+            'subscriber_id' => (string) $user->id,
             'plan_id' => $plan->id,
             'status' => SubscriptionStatus::Active,
             'starts_at' => now()->subMonths(2),
@@ -135,15 +135,15 @@ class SubscriptionTest extends TestCase
         $this->assertFalse($user->subscribed());
         $this->assertFalse($subscription->active());
     }
-    
+
     public function test_cancelled_subscription_is_not_active_if_status_cancelled()
     {
         $user = DummyUser::create();
         $plan = Plan::factory()->create();
-        
+
         $subscription = Subscription::factory()->create([
             'subscriber_type' => DummyUser::class,
-            'subscriber_id' => (string)$user->id,
+            'subscriber_id' => (string) $user->id,
             'plan_id' => $plan->id,
             'status' => SubscriptionStatus::Cancelled,
             'starts_at' => now()->subDays(5),
@@ -160,13 +160,17 @@ class SubscriptionTest extends TestCase
 class DummyUser extends Model
 {
     use HasSubscriptions;
+
     protected $guarded = [];
 }
 
 class DummyUuidUser extends Model
 {
     use HasSubscriptions;
+
     protected $guarded = [];
+
     public $incrementing = false;
+
     protected $keyType = 'string';
 }

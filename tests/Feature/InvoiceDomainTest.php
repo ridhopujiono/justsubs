@@ -2,16 +2,14 @@
 
 namespace Ridho\JustSubs\Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Ridho\JustSubs\Tests\TestCase;
-use Ridho\JustSubs\Models\Invoice;
-use Ridho\JustSubs\Models\Subscription;
-use Ridho\JustSubs\Models\Plan;
-use Ridho\JustSubs\Services\BillingManager;
-use Ridho\JustSubs\Enums\InvoiceStatus;
-use Ridho\JustSubs\Tests\DummyUser;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
+use Ridho\JustSubs\Enums\InvoiceStatus;
+use Ridho\JustSubs\Models\Invoice;
+use Ridho\JustSubs\Services\BillingManager;
+use Ridho\JustSubs\Tests\DummyUser;
+use Ridho\JustSubs\Tests\TestCase;
 
 class InvoiceDomainTest extends TestCase
 {
@@ -20,7 +18,7 @@ class InvoiceDomainTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         Schema::create('dash_users', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
@@ -43,7 +41,7 @@ class InvoiceDomainTest extends TestCase
             'currency' => 'IDR',
             'status' => 'unpaid',
         ]);
-        
+
         // Assert invoice_number was generated securely
         $this->assertStringStartsWith('INV-', $invoice->invoice_number);
     }
@@ -51,7 +49,7 @@ class InvoiceDomainTest extends TestCase
     public function test_invoice_number_is_unique_and_collision_safe()
     {
         $subscriber = DummyUser::create(['name' => 'Jane Doe']);
-        
+
         // Ensure that inserting two invoices concurrently doesn't result in the same invoice number.
         // Since we use the database ID to formulate the invoice number in the model's created event,
         // it inherently cannot collide.
@@ -59,7 +57,7 @@ class InvoiceDomainTest extends TestCase
             'subscriber_type' => DummyUser::class,
             'subscriber_id' => $subscriber->id,
         ]);
-        
+
         $invoice2 = Invoice::factory()->create([
             'subscriber_type' => DummyUser::class,
             'subscriber_id' => $subscriber->id,
@@ -79,7 +77,7 @@ class InvoiceDomainTest extends TestCase
         $this->assertNull($invoice->paid_at);
 
         $manager->markAsPaid($invoice);
-        
+
         $invoice->refresh();
         $this->assertEquals(InvoiceStatus::Paid, $invoice->status);
         $this->assertNotNull($invoice->paid_at);
@@ -93,7 +91,7 @@ class InvoiceDomainTest extends TestCase
         $invoice = $manager->createInvoice($subscriber, 150000, 'IDR');
 
         $manager->voidInvoice($invoice);
-        
+
         $invoice->refresh();
         $this->assertEquals(InvoiceStatus::Void, $invoice->status);
     }

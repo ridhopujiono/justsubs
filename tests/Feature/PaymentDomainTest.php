@@ -2,25 +2,25 @@
 
 namespace Ridho\JustSubs\Tests\Feature;
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use Ridho\JustSubs\Tests\TestCase;
-use Ridho\JustSubs\Models\Invoice;
-use Ridho\JustSubs\Models\Subscription;
-use Ridho\JustSubs\Models\Plan;
-use Ridho\JustSubs\Services\BillingManager;
-use Ridho\JustSubs\Services\PaymentDrivers\ManualPaymentDriver;
+use Illuminate\Support\Facades\Schema;
 use Ridho\JustSubs\Enums\InvoiceStatus;
 use Ridho\JustSubs\Enums\PaymentStatus;
 use Ridho\JustSubs\Enums\SubscriptionStatus;
-use Ridho\JustSubs\Exceptions\PaymentFailedException;
-use Ridho\JustSubs\Tests\DummyUser;
-use Ridho\JustSubs\Events\PaymentReceived;
 use Ridho\JustSubs\Events\InvoicePaid;
+use Ridho\JustSubs\Events\PaymentReceived;
 use Ridho\JustSubs\Events\SubscriptionActivated;
 use Ridho\JustSubs\Events\SubscriptionRenewed;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
+use Ridho\JustSubs\Exceptions\PaymentFailedException;
+use Ridho\JustSubs\Models\Invoice;
+use Ridho\JustSubs\Models\Plan;
+use Ridho\JustSubs\Models\Subscription;
+use Ridho\JustSubs\Services\BillingManager;
+use Ridho\JustSubs\Services\PaymentDrivers\ManualPaymentDriver;
+use Ridho\JustSubs\Tests\DummyUser;
+use Ridho\JustSubs\Tests\TestCase;
 
 class PaymentDomainTest extends TestCase
 {
@@ -29,7 +29,7 @@ class PaymentDomainTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         Schema::create('dash_users', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
@@ -43,7 +43,7 @@ class PaymentDomainTest extends TestCase
 
         $subscriber = DummyUser::create(['name' => 'John Doe']);
         $plan = Plan::factory()->create(['price' => 150000, 'currency' => 'IDR', 'interval_count' => 1, 'interval_unit' => 'month']);
-        
+
         // Setup pending subscription
         $subscription = Subscription::factory()->create([
             'plan_id' => $plan->id,
@@ -57,7 +57,7 @@ class PaymentDomainTest extends TestCase
         $billing = app(BillingManager::class);
         $invoice = $billing->createInvoice($subscriber, 150000, 'IDR', $subscription);
 
-        $driver = new ManualPaymentDriver();
+        $driver = new ManualPaymentDriver;
         $payment = $billing->processPayment($invoice, $driver, 150000, 'IDR');
 
         // Assert payment
@@ -74,7 +74,7 @@ class PaymentDomainTest extends TestCase
         $this->assertEquals(SubscriptionStatus::Active, $subscription->status);
         $this->assertNotNull($subscription->starts_at);
         $this->assertNotNull($subscription->ends_at);
-        
+
         // Assert Events
         Event::assertDispatched(PaymentReceived::class);
         Event::assertDispatched(InvoicePaid::class);
@@ -87,7 +87,7 @@ class PaymentDomainTest extends TestCase
 
         $subscriber = DummyUser::create();
         $plan = Plan::factory()->create(['interval_count' => 1, 'interval_unit' => 'month']);
-        
+
         $originalEndsAt = now()->addDays(5);
         $subscription = Subscription::factory()->create([
             'plan_id' => $plan->id,
@@ -101,7 +101,7 @@ class PaymentDomainTest extends TestCase
         $billing = app(BillingManager::class);
         $invoice = $billing->createInvoice($subscriber, $plan->price, $plan->currency, $subscription);
 
-        $driver = new ManualPaymentDriver();
+        $driver = new ManualPaymentDriver;
         $billing->processPayment($invoice, $driver, $plan->price, $plan->currency);
 
         $subscription->refresh();
@@ -115,11 +115,11 @@ class PaymentDomainTest extends TestCase
         $billing = app(BillingManager::class);
         $invoice = $billing->createInvoice($subscriber, 150000, 'IDR');
 
-        $driver = new ManualPaymentDriver();
+        $driver = new ManualPaymentDriver;
 
         $this->expectException(PaymentFailedException::class);
         $this->expectExceptionMessage('Payment amount does not match invoice amount.');
-        
+
         $billing->processPayment($invoice, $driver, 140000, 'IDR');
     }
 
@@ -129,11 +129,11 @@ class PaymentDomainTest extends TestCase
         $billing = app(BillingManager::class);
         $invoice = $billing->createInvoice($subscriber, 150000, 'IDR');
 
-        $driver = new ManualPaymentDriver();
+        $driver = new ManualPaymentDriver;
 
         $this->expectException(PaymentFailedException::class);
         $this->expectExceptionMessage('Payment currency does not match invoice currency.');
-        
+
         $billing->processPayment($invoice, $driver, 150000, 'USD');
     }
 
@@ -143,12 +143,12 @@ class PaymentDomainTest extends TestCase
         $billing = app(BillingManager::class);
         $invoice = $billing->createInvoice($subscriber, 150000, 'IDR');
 
-        $driver = new ManualPaymentDriver();
+        $driver = new ManualPaymentDriver;
         $billing->processPayment($invoice, $driver, 150000, 'IDR');
 
         $this->expectException(PaymentFailedException::class);
         $this->expectExceptionMessage('Invoice is already paid.');
-        
+
         // Second attempt
         $billing->processPayment($invoice, $driver, 150000, 'IDR');
     }
@@ -159,7 +159,7 @@ class PaymentDomainTest extends TestCase
         $billing = app(BillingManager::class);
         $invoice = $billing->createInvoice($subscriber, 150000, 'IDR');
 
-        $driver = new ManualPaymentDriver();
+        $driver = new ManualPaymentDriver;
 
         try {
             $billing->processPayment($invoice, $driver, 999, 'IDR');
@@ -170,7 +170,7 @@ class PaymentDomainTest extends TestCase
         $this->assertDatabaseMissing('justsubs_payments', [
             'invoice_id' => $invoice->id,
         ]);
-        
+
         $invoice->refresh();
         $this->assertEquals(InvoiceStatus::Unpaid, $invoice->status);
     }

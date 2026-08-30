@@ -2,16 +2,16 @@
 
 namespace Ridho\JustSubs\Tests\Feature;
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Ridho\JustSubs\Tests\TestCase;
-use Ridho\JustSubs\Models\Subscription;
-use Ridho\JustSubs\Models\Plan;
-use Ridho\JustSubs\Services\SubscriptionManager;
+use Illuminate\Support\Facades\Schema;
 use Ridho\JustSubs\Enums\IntervalUnit;
 use Ridho\JustSubs\Enums\SubscriptionStatus;
+use Ridho\JustSubs\Models\Plan;
+use Ridho\JustSubs\Models\Subscription;
+use Ridho\JustSubs\Services\SubscriptionManager;
 use Ridho\JustSubs\Tests\DummyUser;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
+use Ridho\JustSubs\Tests\TestCase;
 
 class SecurityHardeningTest extends TestCase
 {
@@ -20,7 +20,7 @@ class SecurityHardeningTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         Schema::create('dash_users', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();

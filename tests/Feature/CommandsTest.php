@@ -23,7 +23,7 @@ class CommandsTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertTrue(File::exists(config_path('justsubs.php')));
-        
+
         // Clean up
         File::delete(config_path('justsubs.php'));
     }

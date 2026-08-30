@@ -2,16 +2,18 @@
 
 namespace Ridho\JustSubs\Tests\Feature;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
+use Ridho\JustSubs\Enums\SubscriptionStatus;
 use Ridho\JustSubs\JustSubs;
-use Ridho\JustSubs\Tests\TestCase;
 use Ridho\JustSubs\Models\Plan;
 use Ridho\JustSubs\Models\Subscription;
-use Ridho\JustSubs\Enums\SubscriptionStatus;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Eloquent\Model;
 use Ridho\JustSubs\Tests\DummyUser;
+use Ridho\JustSubs\Tests\TestCase;
 
 class SubscriptionManagementTest extends TestCase
 {
@@ -20,7 +22,7 @@ class SubscriptionManagementTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         Schema::create('dash_users', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
@@ -32,7 +34,9 @@ class SubscriptionManagementTest extends TestCase
             return $subscriber->name ?? 'Custom Resolved Name';
         });
 
-        JustSubs::auth(function () { return true; });
+        JustSubs::auth(function () {
+            return true;
+        });
     }
 
     protected function tearDown(): void
@@ -47,16 +51,14 @@ class SubscriptionManagementTest extends TestCase
         $app['config']->set('justsubs.route.middleware', ['web']);
     }
 
-    /**
-     * @define-env defineEnvironmentForTesting
-     */
+    #[DefineEnvironment('defineEnvironmentForTesting')]
     public function test_can_list_and_filter_subscriptions()
     {
         $plan1 = Plan::factory()->create(['name' => 'Plan A']);
         $plan2 = Plan::factory()->create(['name' => 'Plan B']);
 
         // Insert a dummy user directly using DB facade since we don't have a model
-        \Illuminate\Support\Facades\DB::table('dash_users')->insert(['id' => 1, 'name' => 'John Doe']);
+        DB::table('dash_users')->insert(['id' => 1, 'name' => 'John Doe']);
 
         $sub1 = Subscription::factory()->create([
             'plan_id' => $plan1->id,
@@ -89,7 +91,7 @@ class SubscriptionManagementTest extends TestCase
         $response->assertDontSee('Custom Resolved Name'); // Plan B
 
         // Filter by plan_id
-        $response = $this->get('/justsubs/subscriptions?plan_id=' . $plan2->id);
+        $response = $this->get('/justsubs/subscriptions?plan_id='.$plan2->id);
         $response->assertDontSee('John Doe');
         $response->assertSee('Custom Resolved Name');
 
@@ -99,9 +101,7 @@ class SubscriptionManagementTest extends TestCase
         $response->assertDontSee('Custom Resolved Name');
     }
 
-    /**
-     * @define-env defineEnvironmentForTesting
-     */
+    #[DefineEnvironment('defineEnvironmentForTesting')]
     public function test_can_show_subscription_details()
     {
         $plan = Plan::factory()->create(['name' => 'Plan A']);
@@ -114,7 +114,7 @@ class SubscriptionManagementTest extends TestCase
             'ends_at' => now()->addDays(25),
         ]);
 
-        $response = $this->get('/justsubs/subscriptions/' . $sub->id);
+        $response = $this->get('/justsubs/subscriptions/'.$sub->id);
         $response->assertStatus(200);
         $response->assertSee('Plan A');
         $response->assertSee('123');
@@ -122,16 +122,14 @@ class SubscriptionManagementTest extends TestCase
         $response->assertSee('Cancel');
     }
 
-    /**
-     * @define-env defineEnvironmentForTesting
-     */
+    #[DefineEnvironment('defineEnvironmentForTesting')]
     public function test_can_renew_subscription_via_http()
     {
         $plan = Plan::factory()->create([
             'interval_count' => 1,
             'interval_unit' => 'month',
         ]);
-        
+
         $sub = Subscription::factory()->create([
             'plan_id' => $plan->id,
             'subscriber_type' => DummyUser::class,
@@ -145,14 +143,12 @@ class SubscriptionManagementTest extends TestCase
 
         $response = $this->post("/justsubs/subscriptions/{$sub->id}/renew");
         $response->assertRedirect("/justsubs/subscriptions/{$sub->id}");
-        
+
         $sub->refresh();
         $this->assertTrue($sub->ends_at->gt($originalEndsAt));
     }
 
-    /**
-     * @define-env defineEnvironmentForTesting
-     */
+    #[DefineEnvironment('defineEnvironmentForTesting')]
     public function test_can_extend_subscription_via_http()
     {
         $plan = Plan::factory()->create();
@@ -172,9 +168,9 @@ class SubscriptionManagementTest extends TestCase
             'unit' => 'week',
             'reason' => 'Good customer',
         ]);
-        
+
         $response->assertRedirect("/justsubs/subscriptions/{$sub->id}");
-        
+
         $sub->refresh();
         $this->assertEquals(
             $originalEndsAt->addWeeks(2)->toDateTimeString(),
@@ -183,14 +179,12 @@ class SubscriptionManagementTest extends TestCase
         $this->assertEquals('Good customer', $sub->metadata['extensions'][0]['reason']);
     }
 
-    /**
-     * @define-env defineEnvironmentForTesting
-     */
+    #[DefineEnvironment('defineEnvironmentForTesting')]
     public function test_can_change_plan_via_http()
     {
         $plan1 = Plan::factory()->create();
         $plan2 = Plan::factory()->create();
-        
+
         $sub = Subscription::factory()->create([
             'plan_id' => $plan1->id,
             'subscriber_type' => DummyUser::class,
@@ -203,16 +197,14 @@ class SubscriptionManagementTest extends TestCase
         $response = $this->post("/justsubs/subscriptions/{$sub->id}/change-plan", [
             'plan_id' => $plan2->id,
         ]);
-        
+
         $response->assertRedirect("/justsubs/subscriptions/{$sub->id}");
-        
+
         $sub->refresh();
         $this->assertEquals($plan2->id, $sub->plan_id);
     }
 
-    /**
-     * @define-env defineEnvironmentForTesting
-     */
+    #[DefineEnvironment('defineEnvironmentForTesting')]
     public function test_can_cancel_subscription_gracefully_via_http()
     {
         $plan = Plan::factory()->create();
@@ -228,17 +220,15 @@ class SubscriptionManagementTest extends TestCase
         $response = $this->post("/justsubs/subscriptions/{$sub->id}/cancel", [
             'immediately' => 0,
         ]);
-        
+
         $response->assertRedirect("/justsubs/subscriptions/{$sub->id}");
-        
+
         $sub->refresh();
         $this->assertEquals(SubscriptionStatus::Active, $sub->status); // still active
         $this->assertNotNull($sub->cancelled_at); // but cancelled
     }
 
-    /**
-     * @define-env defineEnvironmentForTesting
-     */
+    #[DefineEnvironment('defineEnvironmentForTesting')]
     public function test_can_terminate_subscription_immediately_via_http()
     {
         $plan = Plan::factory()->create();
@@ -254,9 +244,9 @@ class SubscriptionManagementTest extends TestCase
         $response = $this->post("/justsubs/subscriptions/{$sub->id}/cancel", [
             'immediately' => 1,
         ]);
-        
+
         $response->assertRedirect("/justsubs/subscriptions/{$sub->id}");
-        
+
         $sub->refresh();
         $this->assertEquals(SubscriptionStatus::Cancelled, $sub->status);
         $this->assertNotNull($sub->cancelled_at);

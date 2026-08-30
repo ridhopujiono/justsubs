@@ -2,20 +2,20 @@
 
 namespace Ridho\JustSubs\Tests\Feature;
 
+use Carbon\Carbon;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Ridho\JustSubs\Tests\TestCase;
-use Ridho\JustSubs\Models\Plan;
-use Ridho\JustSubs\Models\Subscription;
-use Ridho\JustSubs\Models\Invoice;
-use Ridho\JustSubs\Models\Payment;
-use Ridho\JustSubs\Services\AnalyticsService;
-use Ridho\JustSubs\Enums\SubscriptionStatus;
+use Illuminate\Support\Facades\Schema;
 use Ridho\JustSubs\Enums\InvoiceStatus;
 use Ridho\JustSubs\Enums\PaymentStatus;
+use Ridho\JustSubs\Enums\SubscriptionStatus;
+use Ridho\JustSubs\Models\Invoice;
+use Ridho\JustSubs\Models\Payment;
+use Ridho\JustSubs\Models\Plan;
+use Ridho\JustSubs\Models\Subscription;
+use Ridho\JustSubs\Services\AnalyticsService;
 use Ridho\JustSubs\Tests\DummyUser;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
+use Ridho\JustSubs\Tests\TestCase;
 
 class AnalyticsServiceTest extends TestCase
 {
@@ -24,7 +24,7 @@ class AnalyticsServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         Schema::create('dash_users', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
@@ -35,7 +35,7 @@ class AnalyticsServiceTest extends TestCase
     public function test_active_subscriptions_count()
     {
         $subscriber = DummyUser::create(['name' => 'Alice']);
-        
+
         // Active
         Subscription::factory()->create([
             'subscriber_type' => DummyUser::class,
@@ -103,7 +103,7 @@ class AnalyticsServiceTest extends TestCase
 
         $analytics = app(AnalyticsService::class);
         $this->assertEquals(50000, $analytics->getRevenueReceived($start, $end));
-        
+
         Carbon::setTestNow(); // reset
     }
 
@@ -121,7 +121,7 @@ class AnalyticsServiceTest extends TestCase
     public function test_plan_distribution()
     {
         $subscriber = DummyUser::create(['name' => 'Alice']);
-        
+
         $planA = Plan::factory()->create(['name' => 'Plan A']);
         $planB = Plan::factory()->create(['name' => 'Plan B']);
 
@@ -164,7 +164,7 @@ class AnalyticsServiceTest extends TestCase
     public function test_estimated_mrr_normalization()
     {
         $subscriber = DummyUser::create(['name' => 'Alice']);
-        
+
         $monthlyPlan = Plan::factory()->create(['price' => 100000, 'interval_unit' => 'month', 'interval_count' => 1]); // MRR = 100000
         $yearlyPlan = Plan::factory()->create(['price' => 1200000, 'interval_unit' => 'year', 'interval_count' => 1]); // MRR = 100000
         $weeklyPlan = Plan::factory()->create(['price' => 20000, 'interval_unit' => 'week', 'interval_count' => 1]); // MRR = 20000 * 4.33 = 86600

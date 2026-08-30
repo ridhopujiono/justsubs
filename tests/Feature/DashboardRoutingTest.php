@@ -2,10 +2,10 @@
 
 namespace Ridho\JustSubs\Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use Ridho\JustSubs\JustSubs;
 use Ridho\JustSubs\Tests\TestCase;
-
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class DashboardRoutingTest extends TestCase
 {
@@ -22,9 +22,7 @@ class DashboardRoutingTest extends TestCase
         $app['config']->set('justsubs.route.middleware', ['web']);
     }
 
-    /**
-     * @define-env defineEnvironmentForTesting
-     */
+    #[DefineEnvironment('defineEnvironmentForTesting')]
     public function test_dashboard_is_unauthorized_by_default_in_testing_env()
     {
         // The default auth checks app()->environment('local').
@@ -32,9 +30,7 @@ class DashboardRoutingTest extends TestCase
         $this->get('/justsubs')->assertStatus(403);
     }
 
-    /**
-     * @define-env defineEnvironmentForTesting
-     */
+    #[DefineEnvironment('defineEnvironmentForTesting')]
     public function test_dashboard_is_authorized_with_custom_callback()
     {
         JustSubs::auth(function ($request) {
@@ -46,26 +42,22 @@ class DashboardRoutingTest extends TestCase
             ->assertSee('JustSubs Dashboard');
     }
 
-    /**
-     * @define-env defineEnvironmentForTesting
-     */
+    #[DefineEnvironment('defineEnvironmentForTesting')]
     public function test_dashboard_is_authorized_by_default_in_local_env()
     {
         $this->app['env'] = 'local';
-        
+
         $this->get('/justsubs')
             ->assertStatus(200)
             ->assertSee('JustSubs Dashboard');
     }
-    
+
     protected function defineEnvironmentForPrefix($app)
     {
         $app['config']->set('justsubs.route.prefix', 'admin/subs');
     }
 
-    /**
-     * @define-env defineEnvironmentForPrefix
-     */
+    #[DefineEnvironment('defineEnvironmentForPrefix')]
     public function test_route_uses_configured_prefix()
     {
         $this->assertEquals(url('admin/subs'), route('justsubs.dashboard'));

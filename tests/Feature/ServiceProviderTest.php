@@ -2,9 +2,9 @@
 
 namespace Ridho\JustSubs\Tests\Feature;
 
-use Ridho\JustSubs\Tests\TestCase;
-use Ridho\JustSubs\JustSubsServiceProvider;
 use Illuminate\Support\Facades\Config;
+use Ridho\JustSubs\JustSubsServiceProvider;
+use Ridho\JustSubs\Tests\TestCase;
 
 class ServiceProviderTest extends TestCase
 {
