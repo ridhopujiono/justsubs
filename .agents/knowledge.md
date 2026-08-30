@@ -108,10 +108,10 @@ Subscriber dapat berupa: User, Company, Organization, atau custom Eloquent model
 *(Catatan: Maintainability lebih diutamakan daripada membuat compatibility hack yang buruk.)*
 
 ## Current Development Stage
-Current Stage: Stage 9 — Invoice Domain
+Current Stage: Stage 10 — Payment Domain & Manual Driver
 Status: Completed
-Last Completed: Invoice model, statuses enum, BillingManager for generating invoices and handling statuses. Collision-safe invoice numbering.
-Next Planned: Stage 10
+Last Completed: PaymentDriver contract, ManualPaymentDriver, Payment model & migrations, transaction workflows in BillingManager, idempotency via PaymentFailedException.
+Next Planned: Stage 11
 
 ## Architecture Decision Log
 
@@ -134,6 +134,7 @@ Next Planned: Stage 10
 | 2026-08-29 | Dashboard Authorization Pattern. | Otorisasi diserahkan pada Closure kustom melalui facade `JustSubs::auth()`. Secara default (jika callback tidak di-set), dashboard tertutup (403), kecuali di environment `local`. Ini menghindari expose tidak sengaja di production. |
 | 2026-08-29 | Subscriber Resolver Strategy. | Daripada menebak atau menggunakan Dynamic SQL untuk melacak `name`/`email` dari Polymorphic Subscriber, kita menyediakan Public API: `JustSubs::resolveSubscriberNameUsing(Closure)`. Default *fallback*-nya mengecek object property `name` atau `email`. |
 | 2026-08-30 | Collision-safe Invoice Numbering. | Nomor Invoice di-*generate* secara dinamis di model event `created` dengan format `INV-{YYYYMM}-{ID}` untuk menjamin `100% collision-safe` (karena `$id` dijamin unik di database). |
+| 2026-08-30 | Payment Driver Contract. | Domain Payment dibuat independen (`PaymentDriver`) tanpa hard-code Midtrans/Stripe. Operasi pembayaran diletakkan di `BillingManager` dengan jaminan transaksi (`DB::transaction`) dan pencegahan duplikasi bayar (idempotency throw `PaymentFailedException`). |
 
 ## Updating This File
 File `.agents/knowledge.md` ini HANYA diperbarui untuk keputusan yang memiliki dampak lintas tahap atau keputusan arsitektur jangka panjang.
