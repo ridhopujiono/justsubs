@@ -108,9 +108,9 @@ Subscriber dapat berupa: User, Company, Organization, atau custom Eloquent model
 *(Catatan: Maintainability lebih diutamakan daripada membuat compatibility hack yang buruk.)*
 
 ## Current Development Stage
-Current Stage: Stage 13 — Events, Extensibility & Public API Review
+Current Stage: Stage 14 — Hardening & Security Review
 Status: Completed
-Last Completed: Verified `HasSubscriptions` trait for model interaction (`subscribed()`, `subscribedTo()`), configured Facade extensions (`extendPaymentDriver`), reviewed Events semantic, added tests for Extensibility, and generated `README.md` containing stable Public API documentations.
+Last Completed: Performed comprehensive security and performance review. Fixed `extend()` crash on pending subscriptions. Optimized `getEstimatedMRR` to prevent memory exhaustion by using DB aggregate groupings. Added regression tests.
 Next Planned: Project Completed.
 
 ## Architecture Decision Log
@@ -136,6 +136,7 @@ Next Planned: Project Completed.
 | 2026-08-30 | Collision-safe Invoice Numbering. | Nomor Invoice di-*generate* secara dinamis di model event `created` dengan format `INV-{YYYYMM}-{ID}` untuk menjamin `100% collision-safe` (karena `$id` dijamin unik di database). |
 | 2026-08-30 | Payment Driver Contract. | Domain Payment dibuat independen (`PaymentDriver`) tanpa hard-code Midtrans/Stripe. Operasi pembayaran diletakkan di `BillingManager` dengan jaminan transaksi (`DB::transaction`) dan pencegahan duplikasi bayar (idempotency throw `PaymentFailedException`). |
 | 2026-08-30 | MRR Normalization. | Metric MRR (Monthly Recurring Revenue) dihitung berdasarkan normalisasi matematika sederhana: Harian (`*30`), Mingguan (`*4.33`), Bulanan (`/count`), dan Tahunan (`/12`). Hal ini direpresentasikan di `AnalyticsService::getEstimatedMRR`. |
+| 2026-08-30 | Analytics Scaling Strategy. | Fungsi `getEstimatedMRR()` diubah dari _loading_ seluruh subscription menggunakan Eloquent `get()` menjadi `DB::raw('COUNT')` yang di-_group_ berdasarkan `plan_id`. Ini mencegah _Out of Memory_ (OOM) fatal ketika jumlah _subscriber_ menembus puluhan ribu. |
 
 ## Updating This File
 File `.agents/knowledge.md` ini HANYA diperbarui untuk keputusan yang memiliki dampak lintas tahap atau keputusan arsitektur jangka panjang.
