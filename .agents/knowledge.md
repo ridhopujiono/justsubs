@@ -108,10 +108,10 @@ Subscriber dapat berupa: User, Company, Organization, atau custom Eloquent model
 *(Catatan: Maintainability lebih diutamakan daripada membuat compatibility hack yang buruk.)*
 
 ## Current Development Stage
-Current Stage: Stage 17 complete
-Status: CI and quality gate established
-Last Completed: Automated compatibility and quality pipeline configured (GitHub Actions). Verified tests on PHP 8.3 x Laravel 11/12/13 constraints. Added Larastan and Pint.
-Next Planned: Stage 18 — Demo Application & Showcase
+Current Stage: Stage 18 complete
+Status: Demo application and showcase ready
+Last Completed: Real-world JustSubs showcase
+Next Planned: Stage 19 — Public Repository & v0.1.0 Release
 
 ## Architecture Decision Log
 
@@ -145,3 +145,8 @@ File `.agents/knowledge.md` ini HANYA diperbarui untuk keputusan yang memiliki d
 - Temporary debugging note
 - Todo harian
 - Output test panjang
+
+### ADR 6: Demo Application Location
+**Context**: We need a realistic showcase application for JustSubs without polluting the core package dependencies or source files.
+**Decision**: Placed a standard, isolated Laravel application inside the `demo/` directory of the repository.
+**Rationale**: A separate `demo/` folder allows `composer.json` to require JustSubs via a local relative path (`*@dev`), acting exactly like a real consumer application while remaining within the same repository for easy testing and documentation screenshots.

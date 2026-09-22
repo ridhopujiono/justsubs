@@ -30,10 +30,17 @@ class SubscriberController extends Controller
                 $item->model = $model;
                 $item->resolved_name = JustSubs::getSubscriberName($model);
 
-                if (method_exists($model, 'subscriptions')) {
-                    $item->active_subscription = $model->subscriptions()->active()->latest()->first();
+                if (method_exists($model, 'activeSubscription')) {
+                    $item->active_subscription = $model->activeSubscription();
                 } else {
-                    $item->active_subscription = null;
+                    // Fallback if trait is missing
+                    $item->active_subscription = Subscription::where('subscriber_type', $item->subscriber_type)
+                        ->where('subscriber_id', $item->subscriber_id)
+                        ->where('status', \Ridho\JustSubs\Enums\SubscriptionStatus::Active->value)
+                        ->where('starts_at', '<=', now())
+                        ->where('ends_at', '>=', now())
+                        ->latest('id')
+                        ->first();
                 }
             } else {
                 $item->model = null;
