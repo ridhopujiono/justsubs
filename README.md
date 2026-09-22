@@ -1,3 +1,7 @@
+<p align="center">
+    <img src="https://i.postimg.cc/SKjhtHdv/Logo-Just-Subs-Bernuansa-Neon-Ungu-(1).png" alt="JustSubs Logo" width="300">
+</p>
+
 # JustSubs
 
 **JustSubs** is a solid, self-hosted subscription and billing infrastructure package for Laravel applications. It abstracts away the complexity of managing plans, polymorphic subscriptions, invoices, and payment processing while providing a built-in, standalone Tailwind CSS dashboard.
