@@ -5,6 +5,7 @@ use Ridho\JustSubs\Http\Controllers\DashboardController;
 use Ridho\JustSubs\Http\Controllers\InvoiceController;
 use Ridho\JustSubs\Http\Controllers\PaymentController;
 use Ridho\JustSubs\Http\Controllers\PlanController;
+use Ridho\JustSubs\Http\Controllers\SubscriberController;
 use Ridho\JustSubs\Http\Controllers\SubscriptionController;
 use Ridho\JustSubs\Http\Middleware\Authorize;
 
@@ -41,8 +42,6 @@ Route::middleware(array_merge(
         // Payments
         Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
 
-        // Stub routes for other navigation
-        Route::get('/subscribers', function () {
-            return 'Subscribers';
-        })->name('subscribers.index');
+        // Subscribers
+        Route::get('/subscribers', [SubscriberController::class, 'index'])->name('subscribers.index');
     });
