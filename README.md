@@ -44,18 +44,37 @@ Here you can change the table names (to prevent collisions with packages like La
 
 ## Dashboard Authorization
 
-By default, the dashboard is only accessible in the `local` environment. To authorize users in production, register an authorization callback within the `boot` method of your `App\Providers\AppServiceProvider`:
+By default, the dashboard is only accessible in the `local` environment. To authorize users in production, register an authorization callback within the `boot` method of your `App\Providers\AppServiceProvider`.
 
+Because it uses a closure, you have total freedom to define who gets access. Here are a few common examples:
+
+**1. Using an array of emails (Horizon style)**
 ```php
 use Ridho\JustSubs\JustSubs;
 
 public function boot()
 {
     JustSubs::auth(function ($request) {
-        // Example: Only allow users with an 'admin' role
-        return $request->user() && $request->user()->is_admin;
+        return in_array($request->user()?->email, [
+            'admin@yourdomain.com',
+            'ceo@yourdomain.com',
+        ]);
     });
 }
+```
+
+**2. Using a Roles package (e.g. Spatie)**
+```php
+JustSubs::auth(function ($request) {
+    return $request->user()?->hasRole('super-admin');
+});
+```
+
+**3. Using Laravel Gates**
+```php
+JustSubs::auth(function ($request) {
+    return $request->user()?->can('view-justsubs-dashboard');
+});
 ```
 
 Since JustSubs uses Polymorphic subscribers, you can also define how to display the subscriber's name in the dashboard:
