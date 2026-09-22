@@ -4,6 +4,7 @@ module.exports = {
     "./resources/views/**/*.blade.php",
     "./src/**/*.php"
   ],
+  darkMode: 'selector',
   theme: {
     extend: {},
   },

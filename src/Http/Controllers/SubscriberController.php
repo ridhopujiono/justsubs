@@ -4,6 +4,7 @@ namespace Ridho\JustSubs\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Ridho\JustSubs\Enums\SubscriptionStatus;
 use Ridho\JustSubs\JustSubs;
 use Ridho\JustSubs\Models\Invoice;
 use Ridho\JustSubs\Models\Subscription;
@@ -36,7 +37,7 @@ class SubscriberController extends Controller
                     // Fallback if trait is missing
                     $item->active_subscription = Subscription::where('subscriber_type', $item->subscriber_type)
                         ->where('subscriber_id', $item->subscriber_id)
-                        ->where('status', \Ridho\JustSubs\Enums\SubscriptionStatus::Active->value)
+                        ->where('status', SubscriptionStatus::Active->value)
                         ->where('starts_at', '<=', now())
                         ->where('ends_at', '>=', now())
                         ->latest('id')
