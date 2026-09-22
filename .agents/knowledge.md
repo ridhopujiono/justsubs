@@ -108,7 +108,7 @@ Subscriber dapat berupa: User, Company, Organization, atau custom Eloquent model
 *(Catatan: Maintainability lebih diutamakan daripada membuat compatibility hack yang buruk.)*
 
 ## Current Development Stage
-Current Stage: Stage 18 complete
+Current Stage: Released (v0.1.0)
 Status: Demo application and showcase ready
 Last Completed: Real-world JustSubs showcase
 Next Planned: Stage 19 — Public Repository & v0.1.0 Release
