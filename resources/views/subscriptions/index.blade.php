@@ -2,15 +2,15 @@
 
 @section('content')
 <div class="mb-6 flex justify-between items-center">
-    <h1 class="text-2xl font-semibold text-gray-900">Subscriptions</h1>
+    <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Subscriptions</h1>
 </div>
 
 <!-- Filters -->
-<div class="bg-white shadow-sm border border-gray-200 rounded-lg mb-6 p-4">
+<div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 rounded-lg mb-6 p-4 transition-colors duration-200">
     <form action="{{ route('justsubs.subscriptions.index') }}" method="GET" class="flex flex-wrap gap-4 items-end">
         <div>
-            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-            <select name="status" id="status" class="mt-1 block w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
+            <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+            <select name="status" id="status" class="mt-1 block w-40 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
                 <option value="">All Statuses</option>
                 <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
                 <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
@@ -19,8 +19,8 @@
         </div>
         
         <div>
-            <label for="plan_id" class="block text-sm font-medium text-gray-700">Plan</label>
-            <select name="plan_id" id="plan_id" class="mt-1 block w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
+            <label for="plan_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Plan</label>
+            <select name="plan_id" id="plan_id" class="mt-1 block w-48 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
                 <option value="">All Plans</option>
                 @foreach($plans as $plan)
                     <option value="{{ $plan->id }}" {{ request('plan_id') == $plan->id ? 'selected' : '' }}>{{ $plan->name }}</option>
@@ -29,70 +29,72 @@
         </div>
 
         <div>
-            <label for="subscriber_id" class="block text-sm font-medium text-gray-700">Subscriber ID (Exact)</label>
-            <input type="text" name="subscriber_id" id="subscriber_id" value="{{ request('subscriber_id') }}" placeholder="Exact ID" class="mt-1 block w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
+            <label for="subscriber_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subscriber ID (Exact)</label>
+            <input type="text" name="subscriber_id" id="subscriber_id" value="{{ request('subscriber_id') }}" placeholder="Exact ID" class="mt-1 block w-40 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
         </div>
 
         <div>
             <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium">Filter</button>
-            <a href="{{ route('justsubs.subscriptions.index') }}" class="ml-2 text-sm text-gray-600 hover:text-gray-900">Clear</a>
+            <a href="{{ route('justsubs.subscriptions.index') }}" class="ml-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">Clear</a>
         </div>
     </form>
 </div>
 
 <!-- List -->
-<div class="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
-    <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-            <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subscriber</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
-                <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
-            </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-            @forelse($subscriptions as $sub)
-            <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-medium text-gray-900">{{ $sub->subscriber_name }}</div>
-                    <div class="text-xs text-gray-500">{{ $sub->subscriber_type }} #{{ $sub->subscriber_id }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">{{ $sub->plan->name ?? 'Unknown Plan' }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    @if($sub->active())
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
-                    @elseif($sub->status->value === 'cancelled')
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Cancelled</span>
-                    @else
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">{{ ucfirst($sub->status->value) }}</span>
-                    @endif
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div>{{ $sub->starts_at->format('M d, Y') }} - {{ $sub->ends_at->format('M d, Y') }}</div>
-                    @if($sub->active() && $sub->cancelled())
-                        <div class="text-xs text-orange-500">Cancels at period end</div>
-                    @endif
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <a href="{{ route('justsubs.subscriptions.show', $sub) }}" class="text-indigo-600 hover:text-indigo-900">Manage</a>
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                    No subscriptions found.
-                </td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+<div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-colors duration-200">
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Subscriber</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Plan</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Period</th>
+                    <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                @forelse($subscriptions as $sub)
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $sub->subscriber_name }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ class_basename($sub->subscriber_type) }} #{{ $sub->subscriber_id }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900 dark:text-gray-100">{{ $sub->plan->name ?? 'Unknown Plan' }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        @if($sub->active())
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border border-transparent dark:border-green-800">Active</span>
+                        @elseif($sub->status->value === 'cancelled')
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border border-transparent dark:border-red-800">Cancelled</span>
+                        @else
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-600">{{ ucfirst($sub->status->value) }}</span>
+                        @endif
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <div>{{ $sub->starts_at->format('M d, Y') }} - {{ $sub->ends_at->format('M d, Y') }}</div>
+                        @if($sub->active() && $sub->cancelled())
+                            <div class="text-xs text-orange-500 dark:text-orange-400">Cancels at period end</div>
+                        @endif
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="{{ route('justsubs.subscriptions.show', $sub) }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">Manage</a>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-center">
+                        No subscriptions found.
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
     
     @if($subscriptions->hasPages())
-    <div class="px-6 py-3 border-t border-gray-200">
+    <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700">
         {{ $subscriptions->links() }}
     </div>
     @endif
